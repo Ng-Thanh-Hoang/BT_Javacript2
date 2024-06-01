@@ -68,35 +68,34 @@ export function tinhSoKW(soKW) {//input:soKW(number)
 }
 
 export function tinhTienThueThuNhap(tongTNNam,soNguoiPhuThuoc) {//input: tongTNNam(number),soNguoiPhuThuoc(number)
-    //process:thuNhapChiuThue(number),thueSuat(number)
+    //process:thueThuNhap(number),thueCaNhan(number)
     //Công Thức: Thu Nhập Chịu Thuế=Tổng Thu Nhập Năm - 4tr - Số người phụ thuộc * 1.6tr\
-    let thuNhapChiuThue=0;
-    thuNhapChiuThue=tongTNNam-4000000-soNguoiPhuThuoc*1600000;
-    let thueSuat=0;
-    if(thuNhapChiuThue<=60000000){
-        thueSuat=5/100;  
-    }
-    else if(thuNhapChiuThue>60000000 && thuNhapChiuThue<=120000000){
-        thueSuat=10/100;
-    }
-    else if(thuNhapChiuThue>120000000 && thuNhapChiuThue<=210000000){
-        thueSuat+=15/100;
-    }
-    else if(thuNhapChiuThue>210000000 && thuNhapChiuThue<=384000000){
-        thueSuat+=20/100;
-    }
-    else if(thuNhapChiuThue>384000000 && thuNhapChiuThue<=624000000){
-        thueSuat+=25/100;
-    }
-    else if(thuNhapChiuThue>624000000 && thuNhapChiuThue<=960000000){
-        thueSuat+=30/100;
-    }
-    else {
-        thueSuat+=35/100;
+    let thueThuNhap=0;
+    thueThuNhap=tongTNNam-4000000-soNguoiPhuThuoc*1600000;
+    let thueCaNhan = 0;
+    if (0 < thueThuNhap && thueThuNhap <= 60e+6) {
+        thueCaNhan = thueThuNhap * (5 / 100); 
+    } else if(60e+6 < thueThuNhap && thueThuNhap <= 120e+6) {
+        // 3e+6 = 60e+6 * 0.05
+        thueCaNhan = 3e+6 + (thueThuNhap - 60e+6) * (10 / 100);
+    } else if(120e+6 < thueThuNhap && thueThuNhap <= 210e+6) {
+        // 9e+6 = 60e+6 * 0.05  6+0e+6 * 0.1
+        thueCaNhan = 9e+6 + (thueThuNhap - 120e+6) * (15 / 100);
+    } else if(210e+6 < thueThuNhap && thueThuNhap <= 384e+6) {
+        // 22500000 = 60e+6 * 0.05 + 60e+6 * 0.1 + 90e+6 * 0.15
+        thueCaNhan = 22500000 + (thueThuNhap - 210e+6) * (20 / 100);
+    } else if(384e+6 < thueThuNhap && thueThuNhap <= 624e+6) {
+        // 57300000 = 60e+6 * 0.05 + 60e+6 * 0.1 + 90e+6 * 0.15 + 174e+6 * 0.2
+        thueCaNhan = 57300000 + (thueThuNhap - 384e+6) * (25 / 100);
+    } else if(624e+6 < thueThuNhap && thueThuNhap <= 960e+6) {
+        // 117300000 = 60e+6 * 0.05 + 60e+6 * 0.1 + 90e+6 * 0.15 + 174e+6 * 0.2 + 240e+6 * 0.25
+        thueCaNhan = 117300000 + (thueThuNhap - 624e+6) * (30 / 100);
+    } else if(960e+6 < thueThuNhap) {
+        // 218100000 = 60e+6 * 0.05 + 60e+6 * 0.1 + 90e+6 * 0.15 + 174e+6 * 0.2 + 240e+6 * 0.25 + 336e+6 * 0.35
+        thueCaNhan = 218100000 + (thueThuNhap - 960e+6) * (35 / 100);
     }
     //output
-    let xuatThueTNCAPhaiTra=thuNhapChiuThue*thueSuat;
-    return xuatThueTNCAPhaiTra;
+    return thueCaNhan;
 }
 
 export function tinhTienCap(maKhachHang,khachHang,soKetNoi,soKenhCaoCap){//input
@@ -105,16 +104,16 @@ export function tinhTienCap(maKhachHang,khachHang,soKetNoi,soKenhCaoCap){//input
     let phiDichVuCoBan=0;
     let thueKenhCaoCap=0;
     let tongBill=0;
-    if(khachHang==='Nhà dân'){
+    if(khachHang==='nhaDan'){
         phiXuLyHoaDon+=4.5;
         phiDichVuCoBan+=20.5;
         thueKenhCaoCap=7.5*soKenhCaoCap;
         tongBill=phiXuLyHoaDon+phiDichVuCoBan+thueKenhCaoCap;
     }
-    else if(khachHang==='Doanh nghiệp'){
+    else if(khachHang==='doanhNghiep'){
         phiXuLyHoaDon+=15;
         if(soKetNoi<=10){
-            phiDichVuCoBan+=75;
+            phiDichVuCoBan=7.5*soKetNoi;
         }
         else if(soKetNoi>10){
             phiDichVuCoBan=75+(soKetNoi-10)*5;
@@ -124,7 +123,7 @@ export function tinhTienCap(maKhachHang,khachHang,soKetNoi,soKenhCaoCap){//input
     }
     //output
     return tinhTienCap.innerHTML = `
-        <h2>Hóa đơn khách hàng ${maKhachHang}:</h2>
+        <h2>Hóa đơn khách hàng ${maKhachHang} có:</h2>
         <p>Phí xử lý hoá đơn: $${phiXuLyHoaDon.toFixed(1)}</p>
         <p>Phí dịch vụ cơ bản: $${phiDichVuCoBan.toFixed(1)}</p>
         <p>Phí thuê kênh cao cấp: $${thueKenhCaoCap.toFixed(1)}</p>
